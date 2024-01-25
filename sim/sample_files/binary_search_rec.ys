@@ -1,0 +1,135 @@
+# NAME SURNAME ID
+.pos 0x0
+init:
+    irmovq stack, %rsp
+    irmovq $6, %rdx
+    irmovq array_begin, %rdi
+    irmovq array_end, %rsi
+    call binary_search
+    halt
+
+# DO NOT CHANGE/REMOVE THIS COMMENT
+
+binary_search:
+LFB1:
+        pushq        %rbx
+        rrmovq        %rsi, %rbx
+        subq        %rdi, %rbx
+
+  
+        #sarq        $4, %rbx
+        irmovq $16, %r14
+        dvvq %r14, %rbx 
+
+
+        #salq        $3, %rbx
+        irmovq $8, %r13
+        mllq %r13, %rbx
+
+        
+        #leaq        (%rdi,%rbx), %rax
+		rrmovq %rdi, %r9
+		rrmovq %rbx, %r10
+		
+		addq %r9, %r10
+		rrmovq %r10, %rax
+		
+
+        #cmpq        %rdi, %rsi
+        rrmovq	%rsi, %r12
+		subq    %rdi, %r12
+
+        jle	L15
+        # jbe        	L15
+
+
+        mrmovq        (%rax), %rcx
+        
+        #cmpq        %rdx, %rcx
+        rrmovq	%rcx, %r12
+		subq    %rdx, %r12
+        
+
+
+        je        	L17
+        jge        	L14
+        
+        
+
+        #leaq        8(%rax), %rdi 
+        rrmovq %rax, %r14
+        irmovq $8, %r13
+        addq %r14, %r13
+        rrmovq %r13, %rdi
+
+
+
+
+
+
+
+        call        binary_search
+        
+        #cmpq        $-1, %rax
+        irmovq	$-1, %r12
+		subq    %rax, %r12
+
+
+        je        	L11
+        
+        
+        #sarq        $3, %rbx  
+        irmovq $8, %r14
+        dvvq %r14, %rbx         
+
+        
+        #leaq        1(%rax,%rbx), %rax
+        rrmovq %rax, %r14
+        rrmovq %rbx, %r13
+        addq %r14, %r13
+        irmovq $1, %r12
+        addq %r12, %r13
+        rrmovq %r13, %rax
+
+L11:
+        popq        %rbx
+        ret
+L17:
+
+        rrmovq        %rbx, %rax
+        
+        #sarq        $3, %rax
+        irmovq $8, %r14
+        dvvq %r14, %rax            
+
+        # addq        $1, %rax
+        irmovq $1, %r14
+        addq     %r14, %rax
+
+        jmp        L11
+L14:
+        rrmovq        %rax, %rsi
+        call        binary_search
+        jmp        L11
+L15:
+        irmovq        $-1, %rax
+        jmp        L11
+
+
+# DO NOT CHANGE/REMOVE THIS COMMENT
+
+.pos 0x1008
+array_begin:
+    .quad 1
+    .quad 2
+    .quad 3
+    .quad 5
+    .quad 6
+    .quad 7
+    .quad 9
+    .quad 11
+array_end:
+    .quad 0
+.pos 0x1F00
+stack:
+    .quad 0

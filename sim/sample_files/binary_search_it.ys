@@ -1,0 +1,73 @@
+# Alp Eren Yalcin 2522126
+
+init:
+    irmovq stack, %rsp
+    irmovq $6, %rdx
+    irmovq array_begin, %rdi
+    irmovq array_end, %rsi
+    call binary_search
+    halt
+
+# DO NOT CHANGE/REMOVE THIS COMMENT
+
+binary_search:
+    # Initialize registers
+    rrmovq %rdi, %r8              # Copy beginning of array to %r8
+    rrmovq %rsi, %r9              # Copy end of array to %r9
+    irmovq $16, %r10              # Constant 0x8 for calculation (pointer arithmetic)
+    irmovq $8, %r11               # Constant 0x8 for calculation (pointer arithmetic)
+    irmovq $1, %r14
+
+start_loop:
+    # Check if begin >= end
+    rrmovq %r9, %rax
+    subq %r8, %rax                # end - begin
+    jle end_loop                  # If less or equal, jump to end loop
+
+    # Calculate mid
+    dvvq %r10, %rax               # Divide by 16 (end - begin) / 2
+    mllq %r11, %rax               # Multiply by 8
+    addq %r8, %rax                # mid = begin + ((end - begin) / 2)
+
+    # Dereference mid and compare with value
+    mrmovq (%rax), %rbx           # Load *mid into %rbx
+    rrmovq %rdx, %rcx             # Copy value to %rcx
+    subq %rbx, %rcx               # Compare *mid with value
+    je found_value                # If equal, jump to found value
+    jl lower_half                 # If *mid < value, search in the lower half
+    addq %r11, %rax               # mid + 0x8
+    rrmovq %rax, %r8              # New begin is mid + 0x8
+    jmp start_loop                # Go back to the start of the loop
+
+found_value:
+    subq %rdi, %rax               # Calculate mid - initial_begin
+    dvvq %r11, %rax               # Divide by 0x8 to get the index
+    addq %r14, %rax               # Add 1 to the result (since indices start at 1)
+    ret                           # Return from the function
+
+lower_half:
+    rrmovq %rax, %r9              # New end is mid
+    jmp start_loop                # Go back to the start of the loop
+
+end_loop:
+    irmovq $-1, %rax  # Set return value to -1 (in hexadecimal)
+    ret                           # Return from the function
+
+
+# DO NOT CHANGE/REMOVE THIS COMMENT
+
+.pos 0x1008
+array_begin:
+    .quad 1
+    .quad 2
+    .quad 3
+    .quad 6
+    .quad 7
+    .quad 8
+    .quad 9
+    .quad 11
+array_end:
+    .quad 0
+.pos 0x1F00
+stack:
+    .quad 0
